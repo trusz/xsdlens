@@ -12,6 +12,7 @@
 	</ul>
 </container>
 
+
 <style>
 	header{
 		font-size: 1.8rem;
@@ -30,6 +31,8 @@
 <script lang="ts">
 	import { selection$, xsd$} from "./stores"
 	import { find_attributes } from "./transform"
+	
+	let { children } = $props();
 
 	let selected_element = $derived.by( () => {
 		const root = $xsd$
@@ -51,3 +54,5 @@
 
 
 </script>
+
+
