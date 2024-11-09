@@ -1,16 +1,16 @@
 
-export function transform(content: string): string{
-	const xsdElement = document.createElement('xsd');
-	xsdElement.innerHTML = content;
+export function transform(xsd_element: HTMLElement | null): string{
+	if(!xsd_element){ return "" };
 
 	const mermaidComponents = []
 
-	const complexTypes = findComplexTypes(xsdElement);
+	const complexTypes = findComplexTypes(xsd_element);
 	mermaidComponents.push(convertComplexTypes(complexTypes));
 
 
 	return `\
 classDiagram
+direction LR
 	${mermaidComponents.join('\n')}	
 `
 }
@@ -27,14 +27,14 @@ function findComplexTypes(xsd: HTMLElement): Element[] {
 }
 
 function convertComplexTypes(complexTypes: Element[]): string {
-	const mstr = complexTypes.slice(1,10).map((complexType) => {
-		const name = complexType.getAttribute('name');
+	const mstr = complexTypes.slice(1,10000).map((complex_type) => {
+		const name = complex_type.getAttribute('name');
 		
 		// 
 		// Extension / Inheritance
 		// eg.: <xs:extension base="eIEC61850-6-100:t6-100LNodeContainer">
 		// 
-		const extElements = Array.from(complexType.querySelectorAll('xs\\:extension'))
+		const extElements = Array.from(complex_type.querySelectorAll('xs\\:extension'))
 		const extensions = extElements.map( extEl => extEl?.getAttribute('base')?.split(':')[1] )
 		const extensionString = extensions.map( ext => `${name} --|> ${ext}`).join('\n')
 	
@@ -42,7 +42,7 @@ function convertComplexTypes(complexTypes: Element[]): string {
 		// Attributes
 		// eg.: <xs:attribute name="type" type="xs:normalizedString" use="optional"/>
 		// 
-		const attributeElements = Array.from(complexType.querySelectorAll('xs\\:attribute'))
+		const attributeElements = find_attributes(complex_type)
 		const attributes = attributeElements.map( attrEl => {
 			return {
 				name: attrEl.getAttribute('name'),
@@ -66,3 +66,7 @@ function convertComplexTypes(complexTypes: Element[]): string {
 	return mstr
 }
 
+export function find_attributes(xsd: Element): Element[] {
+	const elements = xsd.querySelectorAll('xs\\:attribute');
+	return Array.from(elements)
+}
