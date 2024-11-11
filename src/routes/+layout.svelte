@@ -1,5 +1,5 @@
 
-<container class="grid grid-rows-[auto,1fr] grid-cols-[1fr,400px] h-full w-full overflow-hidden">
+<container class="grid grid-rows-[auto,1fr] grid-cols-[1fr,450px] h-full w-full overflow-hidden">
 	<header class="col-span-2 text-black m-6 mt-3 p-4 pt-0 text-center border-b border-[zinc-500]">
 		<h1>Welcome to XSDLens</h1>
 		<Dropzone on:drop={handle_drop} />
@@ -7,7 +7,7 @@
 	<main class="overflow-y-hidden p-4">
 		{@render children()}
 	</main>
-	<aside class=" text-white">
+	<aside class="text-white max-h-[100%]">
 		<Sidebar />
 		<!-- Add more sidebar content here -->
 	</aside>

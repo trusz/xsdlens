@@ -1,4 +1,4 @@
-<Sidebar.Root side="left" variant="floating" collapsible="none">
+<Sidebar.Root side="left" variant="floating" collapsible="none" class="max-h-[100%]">
 	<Sidebar.Content>
 		<Sidebar.Group>
 	  <Sidebar.GroupLabel>

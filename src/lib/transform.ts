@@ -1,3 +1,4 @@
+import type { Nullable } from "./util-types";
 
 export function transform(xsd_element?: HTMLElement): string{
 	if(!xsd_element){ return "" };
@@ -69,4 +70,39 @@ function convertComplexTypes(complexTypes: Element[]): string {
 export function find_attributes(xsd: Element): Element[] {
 	const elements = xsd.querySelectorAll('xs\\:attribute');
 	return Array.from(elements)
+}
+
+export function find_inherited_attributes(xsd: Element): Element[] {
+	const elements = xsd.querySelectorAll('xs\\:attribute');
+	return Array.from(elements)
+}
+
+export function find_extensions_recursive(root: Element, xs: Element): Element[] {
+	const all_extensions: Element [] = []
+	let extensions =  find_extensions(root, xs)
+	while(extensions.length > 0){
+		all_extensions.push(...extensions)
+		extensions = extensions.map( ext => find_extensions(root, ext) ).flat()
+	}
+	return all_extensions
+}
+
+function find_extensions(root: Element, xs: Element): Element[] {
+	const extElements = Array.from(xs.querySelectorAll('xs\\:extension'))
+	const base_names = extElements
+		.map( extEl => extEl?.getAttribute('base')
+		?.split(':')[1] )
+		.filter(Boolean) as string[]
+	const extensions = base_names
+		.map( base_name => find_complex_type_by_name(root, base_name) )
+		.filter(Boolean) as Element[]
+	
+	return extensions
+}
+
+function find_complex_type_by_name(root:Element, name:string): Nullable<Element> {
+	const selector = `xs\\:complexType[name="${name}"]`
+	const element = root.querySelector(`xs\\:complexType[name="${name}"]`);
+	console.log({name, element})
+	return element as Nullable<Element>
 }
