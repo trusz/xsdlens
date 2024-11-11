@@ -1,5 +1,5 @@
 
-export function transform(xsd_element: HTMLElement | null): string{
+export function transform(xsd_element?: HTMLElement): string{
 	if(!xsd_element){ return "" };
 
 	const mermaidComponents = []

@@ -39,27 +39,14 @@
 	import mermaid from "mermaid";
 	import { transform } from "./transform";
     import createPanZoom from "panzoom";
-	import { selection$, xsd$ } from "./stores"
+	import { state } from "$lib/state.svelte"
 
 	interface Props {
 		file: File
 	}
 	let { file }: Props = $props();
-
-	// let root: HTMLElement | null = null
-	// let svg_host: HTMLSpanElement | null = $state(null)
-	// let content = $state("");
-	$effect( () => {
-		file.text().then( text => {
-			const xsd_element = document.createElement('xsd');
-			xsd_element.innerHTML = text
-			xsd$.set(xsd_element)
-			// xsdElement.innerHTML = content;
-			// content = text
-		})
-	})
 	
-	let diagram = $derived( transform($xsd$) );
+	let diagram = $derived( transform(state.xsd) );
 	let svg_promise = $derived( render_diagram(diagram) );
 
 	mermaid.initialize({
@@ -109,8 +96,17 @@
 		console.log("inspecting element: ", node_id)
 		if(!node_id) { return }
 
-		selection$.set(node_id)
+		state.selected_node = node_id
 	}
+	
+	$effect(() => {
+	if(!state.file){ return }
+	state.file.text().then( text => {
+		const xsd_element = document.createElement('xsd');
+		xsd_element.innerHTML = text
+		state.xsd = xsd_element
+	})
+})
 
 	// $effect( () => add_interactivity(root, svg_promise) )
 	function add_interactivity(svg_host: HTMLElement) {
