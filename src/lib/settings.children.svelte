@@ -1,39 +1,23 @@
 <settings-element class="mt-6 grid gap-2 overflow-scroll w-auto">
 	{#if selected_element && states.xsd}
-		<SettingsAttributeTable 
+		<ChildrenTable 
 			name={selected_element.getAttribute("name")} 
-			attr_elements={find_attributes(selected_element)}
+			children_elements={children}
 		/>
 			
-		
-		{#if extensions.length > 0}
-		
-		<h4 class="scroll-m-20 text-xl font-semibold tracking-tight">
-			Inherited Attributes
-		</h4>
-
-		{#each extensions as extension}
-			<SettingsAttributeTable 
-				name={extension.getAttribute("name")} 
-				attr_elements={find_attributes(extension)}
-			/>
-		{/each}
-		{/if}
-
 	{/if}
 
 </settings-element>
 
 <script lang="ts">
 	import { states } from "./state.svelte"
-	import { find_attributes, find_extensions_recursive } from "./transform"
-	import SettingsAttributeTable from "./settings.attribute-table.svelte"
+	import { find_children_elements } from "./transform"
+	import ChildrenTable from "./settings.children-table.svelte"
 
-
-	const extensions = $derived.by( () => {
+	const children = $derived.by( () => {
 		if(!states.xsd || !selected_element) { return [] }
 		
-		return find_extensions_recursive(states.xsd, selected_element)
+		return find_children_elements(states.xsd, selected_element)
 	})
 
 	
@@ -48,7 +32,6 @@
 		const selector = `xs\\:complexType[name="${node_id}"]`
 		
 		const element = root.querySelector(selector)
-		console.log({element, root, selector, node_id})
 		return element
 	})
 

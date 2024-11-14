@@ -27,9 +27,9 @@
 
 <script lang="ts">
 	import * as Table from "$lib/components/ui/table/index.js";
-	import { Badge } from "$lib/components/ui/badge/index.js";
 	import type { Nullable } from "./util-types";
 	import * as Card from "$lib/components/ui/card/index.js";
+	
 		
 
 

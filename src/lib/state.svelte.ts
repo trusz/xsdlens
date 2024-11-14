@@ -29,10 +29,21 @@ export function createState(){
 		get file() { return file },
 		set file(value: Optional<File>) { file = value },
 		get selected_node() { return selected_node },
-		set selected_node(value: string) { selected_node = value },
 		get xsd() { return xsd },
 		set xsd(value: Optional<HTMLElement>) { xsd = value },
+		set_selected_node(value: string) { 
+			window.location.hash = value
+		 },
+		init_url_state_sync(){
+			window.addEventListener("popstate", (e: unknown) => {
+				const node_id = document.location.hash.replace("#", "")
+				console.log("navigate", node_id)	
+				selected_node = node_id
+			})
+		},
 	}
 }
 
-export let state = createState()
+export let states = createState()
+
+

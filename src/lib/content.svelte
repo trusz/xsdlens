@@ -7,7 +7,7 @@
 		onclickcapture={handle_onclick}
 		role="document"
 	>
-		<view-port>
+		<view-port bind:this={ref_view_port}>
 			{@html svg}
 		</view-port>
 	</container>
@@ -33,53 +33,49 @@
 		flex: 1;
   		height: auto;
 	}
+
+	:global(view-port #mermaid a.selected  .basic > path) {
+		@apply stroke-blue-500 stroke-2
+	}
 </style>
+
 
 <script lang="ts">
 	import mermaid from "mermaid";
 	import { transform } from "./transform";
     import createPanZoom from "panzoom";
-	import { state } from "$lib/state.svelte"
+	import { states } from "$lib/state.svelte"
+    import type { Nullable } from "./util-types";
+	import { onMount } from "svelte";
+    import type { NavigationEvent } from "@sveltejs/kit";
+    import { state } from "mermaid/dist/rendering-util/rendering-elements/shapes/state.js";
 
 	interface Props {
 		file: File
 	}
 	let { file }: Props = $props();
 	
-	let diagram = $derived( transform(state.xsd) );
+	let ref_view_port: Nullable<HTMLElement> = null
+	let diagram = $derived( transform(states.xsd) );
 	let svg_promise = $derived( render_diagram(diagram) );
 
-	mermaid.initialize({
+	onMount( () => {
+		mermaid.initialize({
 			startOnLoad: false,
 			securityLevel: 'loose',
-			theme: 'default',
-			// layout: 'LR',
 			elk: {
 				nodePlacementStrategy: "BRANDES_KOEPF",
 			},
-			// deterministicIds: true,
-			// deterministicIDSeed: "123",
-			themeVariables: {
-				fontFamily: 'monospace',
-				fontSize: '16px',
-				fontWeight: 'normal',
-				// fontColor: '#000000',
-				// lineColor: '#000000',
-				// fillColor: '#ffffff',
-				// textColor: '#000000',
-				// primaryColor: '#000000',
-				// primaryBorderColor: '#000000',
-				// secondaryColor: '#000000',
-				// secondaryBorderColor: '#000000',
-				// tertiaryColor: '#000000',
-				// tertiaryBorderColor: '#000000',
-			},
 			logLevel: 5
 		})
+
+		states.init_url_state_sync()
+	})
+
+	
     
 	async function render_diagram(diagram_def: string): Promise<string> {
 		if(diagram_def === "") { return "" }
-		console.log({diagram_def})
 		const {svg} = await mermaid.render('mermaid', diagram_def)
 		return svg
     }
@@ -91,22 +87,24 @@
 
 		const target = e.target as HTMLElement
 		const link = target.closest("a")
-		const node_id = link?.getAttribute("xlink:href")
 		
-		console.log("inspecting element: ", node_id)
+		ref_view_port?.querySelectorAll("a").forEach( a => a.classList.remove("selected") )
+		link?.classList.add("selected")
+
+		const node_id = link?.getAttribute("xlink:href")
 		if(!node_id) { return }
 
-		state.selected_node = node_id
+		states.selected_node = node_id
 	}
-	
+
 	$effect(() => {
-	if(!state.file){ return }
-	state.file.text().then( text => {
-		const xsd_element = document.createElement('xsd');
-		xsd_element.innerHTML = text
-		state.xsd = xsd_element
+		if(!states.file){ return }
+		states.file.text().then( text => {
+			const xsd_element = document.createElement('xsd');
+			xsd_element.innerHTML = text
+			states.xsd = xsd_element
+		})
 	})
-})
 
 	// $effect( () => add_interactivity(root, svg_promise) )
 	function add_interactivity(svg_host: HTMLElement) {

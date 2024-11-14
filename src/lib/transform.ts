@@ -3,16 +3,17 @@ import type { Nullable } from "./util-types";
 export function transform(xsd_element?: HTMLElement): string{
 	if(!xsd_element){ return "" };
 
-	const mermaidComponents = []
+	const mermaid_components = []
 
-	const complexTypes = findComplexTypes(xsd_element);
-	mermaidComponents.push(convertComplexTypes(complexTypes));
+	const complex_types = find_complex_types(xsd_element);
+	mermaid_components.push(convert_complex_types(complex_types));
 
 
 	return `\
+${theme}
 classDiagram
 direction LR
-	${mermaidComponents.join('\n')}	
+	${mermaid_components.join('\n')}	
 `
 }
 
@@ -22,12 +23,12 @@ function findElements(xsd: HTMLElement): Element[] {
 	return Array.from(elements)
 }
 
-function findComplexTypes(xsd: HTMLElement): Element[] {
+export function find_complex_types(xsd: HTMLElement): Element[] {
 	const elements = xsd.querySelectorAll('xs\\:complexType');
 	return Array.from(elements)
 }
 
-function convertComplexTypes(complexTypes: Element[]): string {
+function convert_complex_types(complexTypes: Element[]): string {
 	const mstr = complexTypes.slice(1,10000).map((complex_type) => {
 		const name = complex_type.getAttribute('name');
 		
@@ -100,9 +101,31 @@ function find_extensions(root: Element, xs: Element): Element[] {
 	return extensions
 }
 
+export function find_children_elements(root: Element, xs: Element): Element[] {
+	const children = Array.from(xs.querySelectorAll('xs\\:sequence > xs\\:element'))
+	return children
+}
+
 function find_complex_type_by_name(root:Element, name:string): Nullable<Element> {
 	const selector = `xs\\:complexType[name="${name}"]`
-	const element = root.querySelector(`xs\\:complexType[name="${name}"]`);
-	console.log({name, element})
+	const element = root.querySelector(selector);
 	return element as Nullable<Element>
 }
+
+
+const theme = `
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+      'primaryColor': 'hsl(0 0% 100%)',
+      'primaryTextColor': 'hsl(240 10% 3.9%)',
+      'primaryBorderColor': 'hsl(240 5.9% 90%)',
+      'lineColor': 'hsl(240 5.9% 10%)',
+      'secondaryColor': '#006100',
+      'tertiaryColor': '#fff',
+	  'fontFamily': 'monospace'
+    }
+  }
+}%%
+`

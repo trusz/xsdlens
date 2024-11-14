@@ -17,7 +17,7 @@
 		"@tailwindcss/forms": "^0.5.9",
 		"@tailwindcss/typography": "^0.5.15",
 		"autoprefixer": "^10.4.20",
-		"bits-ui": "1.0.0-next.49",
+		"bits-ui": "1.0.0-next.51",
 		"clsx": "^2.1.1",
 		"lucide-svelte": "^0.456.0",
 		"svelte": "^5.0.0",
