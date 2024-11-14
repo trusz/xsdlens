@@ -23,6 +23,7 @@
 	container { 
 		display: flex;
 		height: 100%;
+		overflow: hidden;
 	}
 	view-port {
 		display: flex;
@@ -48,7 +49,6 @@
     import type { Nullable } from "./util-types";
 	import { onMount } from "svelte";
     import type { NavigationEvent } from "@sveltejs/kit";
-    import { state } from "mermaid/dist/rendering-util/rendering-elements/shapes/state.js";
 
 	interface Props {
 		file: File
@@ -88,14 +88,34 @@
 		const target = e.target as HTMLElement
 		const link = target.closest("a")
 		
-		ref_view_port?.querySelectorAll("a").forEach( a => a.classList.remove("selected") )
-		link?.classList.add("selected")
+		// ref_view_port?.querySelectorAll("a").forEach( a => a.classList.remove("selected") )
+		// link?.classList.add("selected")
 
 		const node_id = link?.getAttribute("xlink:href")
 		if(!node_id) { return }
 
-		states.selected_node = node_id
+		set_selection_in_diagram(node_id)
+		states.set_selected_node(node_id)
 	}
+
+	function set_selection_in_diagram(node_id: string){
+		debugger;
+		ref_view_port?.querySelectorAll("a").forEach( a => a.classList.remove("selected") )
+
+		// because of it is a xlink:href, where the xlink is the namespace
+		// we have to query differently
+		// See: https://stackoverflow.com/questions/23034283/is-it-possible-to-use-htmls-queryselector-to-select-by-xlink-attribute-in-an
+		const selector = `a[*|href="${node_id}"]`
+		const new_selected_node = ref_view_port?.querySelector(selector)
+		new_selected_node?.classList.add("selected")
+	}
+
+	$effect(() => {
+		if(!states.selected_node){ return }
+		set_selection_in_diagram(states.selected_node)
+		// const selected_node = ref_view_port?.querySelector(`a[xlink\\:href="${states.selected_node}"]`)
+		// selected_node?.classList.add("selected")
+	})
 
 	$effect(() => {
 		if(!states.file){ return }
@@ -108,7 +128,7 @@
 
 	// $effect( () => add_interactivity(root, svg_promise) )
 	function add_interactivity(svg_host: HTMLElement) {
-		const svg_canvas = svg_host.querySelector("#mermaid");
+		const svg_canvas = svg_host.querySelector("#mermaid") as HTMLElement;
 		
 		if(!svg_canvas) { return }
 		
@@ -116,7 +136,14 @@
 		const view_port = svg_canvas.querySelector<HTMLElement>("g")
 		if(!view_port) { return }
 		
-		createPanZoom(view_port)
+		// window.pz = createPanZoom(view_port)
+		window.pz = createPanZoom(svg_canvas)
+		
+		// setTimeout(() => {
+		// 	pz.moveTo(202, 2555)	
+		// 	// pz.zoomAbs(0, 0, 1)
+		// }, 2_000)
+
 		
 	}
 

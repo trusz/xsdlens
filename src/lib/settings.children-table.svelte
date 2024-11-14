@@ -1,4 +1,4 @@
-
+{#if children_elements.length > 0}
 <Card.Root class="">
 	<Card.Header>
 		<Card.Title>{name}</Card.Title>
@@ -14,13 +14,13 @@
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{#each children_elements as childElement }
+					{#each children_elements as child_element }
 					<Table.Row>
-						<Table.Cell class="font-medium">{childElement.getAttribute("name")}</Table.Cell>
+						<Table.Cell class="font-medium">{child_element.getAttribute("name")}</Table.Cell>
 						<Table.Cell>
 							<div class="flex gap-2 items-center">
-							{strip_name_space(childElement.getAttribute("type"))}
-							<SquareArrowOutUpRight size={16} />
+							{strip_name_space(child_element.getAttribute("type"))}
+							<a href={`#${ strip_name_space(child_element.getAttribute("type")) }`}><SquareArrowOutUpRight size={16} /></a>
 							</div>
 						</Table.Cell>
 					</Table.Row>
@@ -29,6 +29,9 @@
 			</Table.Root>
 		</Card.Content>
 	</Card.Root>
+{:else}
+	<div class="text-lg font-semibold text-center">No child elements found</div>
+{/if}
 	
 	<script lang="ts">
 		import * as Table from "$lib/components/ui/table/index.js";

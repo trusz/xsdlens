@@ -11,7 +11,7 @@
 			  <Tabs.Trigger value="children">Children</Tabs.Trigger>
 			  <Tabs.Trigger value="document">Document</Tabs.Trigger>
 			</Tabs.List>
-			<Tabs.Content value="attributes" class="max-h-full overflow-auto tabs-content">
+			<Tabs.Content value="attributes" class="max-h-full overflow-auto tabs-content ring-0">
 				<SettingsElement />
 			</Tabs.Content>
 			<Tabs.Content value="children" class="max-h-full overflow-auto tabs-content">

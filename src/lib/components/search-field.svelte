@@ -21,9 +21,18 @@
 	let value = $state("");
 	let triggerRef = $state<HTMLButtonElement>(null!);
 	
-	const selectedValue = $derived(
-	 nodes.find((node) => node === value)
-	);
+	$effect(() => {
+		window.location.hash = value;
+	});
+
+	$effect(() => {
+		value = states.selected_node
+	});
+
+
+	// const selected_value = $derived(
+	//  nodes.find((node) => node === value)
+	// );
 	
 	// We want to refocus the trigger button when the user selects
 	// an item from the list so users can continue navigating the
@@ -41,17 +50,17 @@
 	 {#snippet child({ props })}
 	  <Button
 	   variant="outline"
-	   class="w-[200px] justify-between"
+	   class="w-[400px] justify-between"
 	   {...props}
 	   role="combobox"
 	   aria-expanded={open}
 	  >
-	   {selectedValue || "Select a node..."}
+	   {value || "Select a node..."}
 	   <ChevronsUpDown class="ml-2 size-4 shrink-0 opacity-50" />
 	  </Button>
 	 {/snippet}
 	</Popover.Trigger>
-	<Popover.Content class="w-[200px] p-0">
+	<Popover.Content class="w-[400px] p-0">
 	 <Command.Root>
 	  <Command.Input placeholder="Search framework..." />
 	  <Command.List>
