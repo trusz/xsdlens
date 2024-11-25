@@ -86,7 +86,8 @@ function convert_complex_types(complexTypes: Element[], root:HTMLElement, filter
 		if(filter?.show_children){
 			child_elements = find_children_elements(complex_type)
 		}
-		const child_connections = child_elements.map( child => `${name} --> ${child.getAttribute('type')}`).join('\n')
+		const child_connections = child_elements.map( child => `${name} ..> ${child.getAttribute('type')}`).join('\n')
+		// const child_connections = child_elements.map( child => `${name} ..> ${child.getAttribute('type')} : ${child.getAttribute('name')}`).join('\n')
 		const child_attributes = child_elements.map( child => `${name} : ${child.getAttribute('type')?.split(':')[1] }[] ${child.getAttribute('name')}`).join('\n')
 
 		// 

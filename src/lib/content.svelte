@@ -44,9 +44,9 @@
 <script lang="ts">
 	import mermaid from "mermaid";
 	import { transform, type Converter_Filter } from "./transform";
-    import createPanZoom from "panzoom";
+    import createPanZoom, {type PanZoom} from "panzoom";
 	import { states } from "$lib/state.svelte"
-    import type { Nullable } from "./util-types";
+    import type { Nullable, Optional } from "./util-types";
 	import { onMount } from "svelte";
 	import { mode } from "mode-watcher";
 
@@ -55,7 +55,8 @@
 	}
 	let { file }: Props = $props();
 
-	let ref_view_port: Nullable<HTMLElement> = null
+	let ref_view_port: Nullable<HTMLElement> = $state(null)
+	let panzoom: Optional<PanZoom> = $state();
 	let converter_filter: Converter_Filter = $derived.by( () => {
 		const filter: Converter_Filter = {
 			show_children: states.settings.show_children,
@@ -70,8 +71,6 @@
 	let diagram = $derived( transform(states.xsd, converter_filter, $mode) );
 	let svg_promise = $derived( render_diagram(diagram) );
 
-
-    	const newColorScheme = event.matches ? "dark" : "light";
 	
 	onMount( () => {
 		mermaid.initialize({
@@ -85,6 +84,32 @@
 
 		states.init_url_state_sync()
 	})
+
+	$effect( () => {
+		if(!states.selected_node) { return }
+
+		zoom_to_element(states.selected_node)
+	})
+	function zoom_to_element(name:string){
+		const selector = `a[*|href="${name}"]`
+		const element = document?.querySelector(selector)
+		if(!element) { return }
+
+
+		const middle_x = window.innerWidth / 2;
+		const middle_y = window.innerHeight / 2;
+
+
+		const element_middle_x = element.getClientRects()[0].x + element.getClientRects()[0].width / 2;
+		const element_middle_y = element.getClientRects()[0].y + element.getClientRects()[0].height / 2;
+
+		const dx = middle_x - element_middle_x;
+		const dy = middle_y - element_middle_y;
+
+		console.log({middle_x, middle_y, element_middle_x, element_middle_y, dx, dy})
+
+		panzoom?.moveBy(dx,dy,true)
+	}
 
     
 	async function render_diagram(diagram_def: string): Promise<string> {
@@ -101,9 +126,6 @@
 		const target = e.target as HTMLElement
 		const link = target.closest("a")
 		
-		// ref_view_port?.querySelectorAll("a").forEach( a => a.classList.remove("selected") )
-		// link?.classList.add("selected")
-
 		const node_id = link?.getAttribute("xlink:href")
 		if(!node_id) { return }
 
@@ -112,7 +134,6 @@
 	}
 
 	function set_selection_in_diagram(node_id: string){
-		debugger;
 		ref_view_port?.querySelectorAll("a").forEach( a => a.classList.remove("selected") )
 
 		// because of it is a xlink:href, where the xlink is the namespace
@@ -149,15 +170,8 @@
 		const view_port = svg_canvas.querySelector<HTMLElement>("g")
 		if(!view_port) { return }
 		
-		// window.pz = createPanZoom(view_port)
-		window.pz = createPanZoom(svg_canvas)
-		
-		// setTimeout(() => {
-		// 	pz.moveTo(202, 2555)	
-		// 	// pz.zoomAbs(0, 0, 1)
-		// }, 2_000)
-
-		
+		panzoom = createPanZoom(svg_canvas)
+			
 	}
 
 	

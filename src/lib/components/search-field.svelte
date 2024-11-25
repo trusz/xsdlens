@@ -8,6 +8,7 @@
 	import { cn } from "$lib/utils.js";
 	import { states } from "$lib/state.svelte";
     import { find_complex_types } from "../transform";
+    import createPanZoom from "panzoom";
 
 	let nodes = $derived( 
 		states.xsd
@@ -19,7 +20,7 @@
 	
 	let open = $state(false);
 	let value = $state("");
-	let triggerRef = $state<HTMLButtonElement>(null!);
+	let trigger_ref = $state<HTMLButtonElement>(null!);
 	
 	$effect(() => {
 		window.location.hash = value;
@@ -28,6 +29,9 @@
 	$effect(() => {
 		value = states.selected_node
 	});
+
+
+	
 
 
 	// const selected_value = $derived(
@@ -40,13 +44,13 @@
 	function closeAndFocusTrigger() {
 	 open = false;
 	 tick().then(() => {
-	  triggerRef.focus();
+	  trigger_ref.focus();
 	 });
 	}
    </script>
 	
    <Popover.Root bind:open>
-	<Popover.Trigger bind:ref={triggerRef}>
+	<Popover.Trigger bind:ref={trigger_ref}>
 	 {#snippet child({ props })}
 	  <Button
 	   variant="outline"
