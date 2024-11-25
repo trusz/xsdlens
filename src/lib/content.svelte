@@ -43,22 +43,36 @@
 
 <script lang="ts">
 	import mermaid from "mermaid";
-	import { transform } from "./transform";
+	import { transform, type Converter_Filter } from "./transform";
     import createPanZoom from "panzoom";
 	import { states } from "$lib/state.svelte"
     import type { Nullable } from "./util-types";
 	import { onMount } from "svelte";
-    import type { NavigationEvent } from "@sveltejs/kit";
+	import { mode } from "mode-watcher";
 
 	interface Props {
 		file: File
 	}
 	let { file }: Props = $props();
-	
+
 	let ref_view_port: Nullable<HTMLElement> = null
-	let diagram = $derived( transform(states.xsd) );
+	let converter_filter: Converter_Filter = $derived.by( () => {
+		const filter: Converter_Filter = {
+			show_children: states.settings.show_children,
+			show_extensions: states.settings.show_extensions,
+		}
+		if( states.settings.focus_mode && states.selected_node){
+			filter.node_name = states.selected_node
+		}
+
+		return filter
+	})
+	let diagram = $derived( transform(states.xsd, converter_filter, $mode) );
 	let svg_promise = $derived( render_diagram(diagram) );
 
+
+    	const newColorScheme = event.matches ? "dark" : "light";
+	
 	onMount( () => {
 		mermaid.initialize({
 			startOnLoad: false,
@@ -72,7 +86,6 @@
 		states.init_url_state_sync()
 	})
 
-	
     
 	async function render_diagram(diagram_def: string): Promise<string> {
 		if(diagram_def === "") { return "" }

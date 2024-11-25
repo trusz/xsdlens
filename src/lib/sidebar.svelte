@@ -1,3 +1,4 @@
+
 <Sidebar.Root side="left" variant="floating" collapsible="none" class="max-h-full overflow-hidden">
 	<Sidebar.Content class="max-h-full overflow-hidden">
 	<Sidebar.Group class="max-h-full overflow-hidden">
@@ -18,13 +19,14 @@
 				<SettingsChildren />
 			</Tabs.Content>
 			<Tabs.Content value="document" class="max-h-full overflow-auto tabs-content">
-			 Document Settings
+			 	<SettingsDocument />
 			</Tabs.Content>
 		  </Tabs.Root>
 	   </Sidebar.GroupContent>
 	 </Sidebar.Group>
 	</Sidebar.Content>
    </Sidebar.Root>
+
 
 <style>
 
@@ -36,6 +38,7 @@
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import SettingsElement from "./settings.element.svelte"
 	import SettingsChildren from "./settings.children.svelte"
+	import SettingsDocument from "./settings.document.svelte"
 
 	// let { children } = $props();
 </script>

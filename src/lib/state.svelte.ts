@@ -24,13 +24,24 @@ export function createState(){
 	let file = $state<Optional<File>>(undefined);
 	let selected_node = $state<string>("");
 	let xsd = $state<Optional<HTMLElement>>(undefined);
+	let settings = $state({
+		focus_mode: false,
+		show_children: true,
+		show_extensions: true,
+	})
 
 	return {
 		get file() { return file },
 		set file(value: Optional<File>) { file = value },
 		get selected_node() { return selected_node },
 		get xsd() { return xsd },
-		set xsd(value: Optional<HTMLElement>) { xsd = value },
+		set xsd(value: Optional<HTMLElement>) { 
+			xsd = value; 
+			// @ts-expect-error
+			window.xsd = value
+		 },
+		get settings() { return settings },
+		set settings(value: any) { settings = value },
 		set_selected_node(value: string) { 
 			window.location.hash = value
 		 },

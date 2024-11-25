@@ -6,6 +6,7 @@
 	import { Button } from "$lib/components/ui/button/index.js";
 	import Sidebar from "$lib/sidebar.svelte"
     import SearchField from "$lib/components/search-field.svelte";
+    import ColorSwitcher from "$lib/components/color-switcher.svelte";
 
 	type Props = {
 		children: Snippet
@@ -21,10 +22,13 @@
 			<ScanSearch class="h-6 w-6" />
 			<span class="">XSD Lens</span>	
 		  </a>
-		  <Button variant="outline" size="icon" class="ml-auto h-8 w-8">
-			<Bell class="h-4 w-4" />
-			<span class="sr-only">Toggle notifications</span>
-		  </Button>
+		  <span class="ml-auto h-8 w-8">
+			  <ColorSwitcher />
+		  </span>
+		  <!-- <Button variant="outline" size="icon" class="ml-auto h-8 w-8"> -->
+			<!-- <Bell class="h-4 w-4" /> -->
+			<!-- <span class="sr-only">Toggle notifications</span> -->
+		  <!-- </Button> -->
 		</div>
 		<aside class="flex-1 overflow-hidden">
 			<Sidebar />

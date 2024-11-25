@@ -17,7 +17,7 @@
 		"@tailwindcss/forms": "^0.5.9",
 		"@tailwindcss/typography": "^0.5.15",
 		"autoprefixer": "^10.4.20",
-		"bits-ui": "1.0.0-next.51",
+		"bits-ui": "1.0.0-next.64",
 		"clsx": "^2.1.1",
 		"lucide-svelte": "^0.456.0",
 		"svelte": "^5.0.0",
@@ -32,6 +32,7 @@
 	"dependencies": {
 		"@sveltejs/adapter-static": "^3.0.6",
 		"mermaid": "^11.4.0",
+		"mode-watcher": "^0.5.0",
 		"panzoom": "^9.4.3",
 		"svelte-file-dropzone": "^2.0.9"
 	}
