@@ -1,5 +1,5 @@
 
-<container class="h-full" 
+<container class="h-full scroll-container" 
 	role="document" 
 	ondragstart={handle_on_dragstart} 
 	ondragend={handle_on_dragend} 
@@ -8,14 +8,23 @@
 	ondrop={handle_on_drop}
 >
 	
-	{#if !states.file || user_dragging}
-		<Dropzone on:drop={handle_drop} containerClasses="h-full !bg-zinc-900" accept=".xsd"/>
+	{#if states.view_mode === "diagram"}
+		
+		{#if !states.file || user_dragging}
+			<Dropzone on:drop={handle_drop} containerClasses="h-full !bg-zinc-900" accept=".xsd"/>
+		{/if}
+		{#if states.file && !user_dragging}
+			<main class="h-full">
+				<Content file={states.file} />
+			</main>
+		{/if}
+
 	{/if}
-	{#if states.file && !user_dragging}
-	<main class="h-full">
-		<Content file={states.file} />
-	</main>
+
+	{#if states.view_mode === "code"}
+		<CodeEditor />
 	{/if}
+	
 </container>
 
 <style>
@@ -25,6 +34,7 @@
 <script lang="ts">
 	import Dropzone from "svelte-file-dropzone";
 	import Content from "../lib/content.svelte";
+	import CodeEditor from "$lib/components/code-editor.svelte";
 	import {states} from "$lib/state.svelte";
 
 	let user_dragging = $state(false);

@@ -1,4 +1,4 @@
-<diagram-content>
+<diagram-content bind:this={ref_root}>
 {#await svg_promise then svg}
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -56,6 +56,7 @@
 	let { file }: Props = $props();
 
 	let ref_view_port: Nullable<HTMLElement> = $state(null)
+	let ref_root: Nullable<HTMLElement> = $state(null)
 	let panzoom: Optional<PanZoom> = $state();
 	let converter_filter: Converter_Filter = $derived.by( () => {
 		const filter: Converter_Filter = {
@@ -68,8 +69,10 @@
 
 		return filter
 	})
-	let diagram = $derived( transform(states.xsd, converter_filter, $mode) );
-	let svg_promise = $derived( render_diagram(diagram) );
+	$effect(() => {
+		states.diagram_code = transform(states.xsd, converter_filter, $mode)
+	})
+	let svg_promise = $derived( render_diagram(states.diagram_code) );
 
 	
 	onMount( () => {
@@ -93,24 +96,24 @@
 	function zoom_to_element(name:string){
 		const selector = `a[*|href="${name}"]`
 		const element = document?.querySelector(selector)
-		if(!element) { return }
+		if(!element || !ref_root) { return }
 
+		const root_rects = ref_root.getClientRects()[0]
+		const root_middle_x = root_rects.x + root_rects.width / 2;
+		const root_middle_y = root_rects.y + root_rects.height / 2;
 
-		const middle_x = window.innerWidth / 2;
-		const middle_y = window.innerHeight / 2;
+		const element_rects = element.getClientRects()[0]
+		const element_middle_x = element_rects.x + element_rects.width / 2;
+		const element_middle_y = element_rects.y + element_rects.height / 2;
 
+		const dx = root_middle_x - element_middle_x
+		const dy = root_middle_y - element_middle_y
 
-		const element_middle_x = element.getClientRects()[0].x + element.getClientRects()[0].width / 2;
-		const element_middle_y = element.getClientRects()[0].y + element.getClientRects()[0].height / 2;
-
-		const dx = middle_x - element_middle_x;
-		const dy = middle_y - element_middle_y;
-
-		console.log({middle_x, middle_y, element_middle_x, element_middle_y, dx, dy})
+		// console.log({root_middle_x, root_middle_y, element_middle_x, element_middle_y, dx, dy})
 
 		panzoom?.moveBy(dx,dy,true)
+	
 	}
-
     
 	async function render_diagram(diagram_def: string): Promise<string> {
 		if(diagram_def === "") { return "" }
@@ -147,8 +150,6 @@
 	$effect(() => {
 		if(!states.selected_node){ return }
 		set_selection_in_diagram(states.selected_node)
-		// const selected_node = ref_view_port?.querySelector(`a[xlink\\:href="${states.selected_node}"]`)
-		// selected_node?.classList.add("selected")
 	})
 
 	$effect(() => {
@@ -160,13 +161,11 @@
 		})
 	})
 
-	// $effect( () => add_interactivity(root, svg_promise) )
 	function add_interactivity(svg_host: HTMLElement) {
 		const svg_canvas = svg_host.querySelector("#mermaid") as HTMLElement;
 		
 		if(!svg_canvas) { return }
 		
-		// const view_port = svg_host.querySelector<HTMLElement>("view-port")
 		const view_port = svg_canvas.querySelector<HTMLElement>("g")
 		if(!view_port) { return }
 		

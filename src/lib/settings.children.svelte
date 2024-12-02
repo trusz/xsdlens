@@ -17,7 +17,8 @@
 	const children = $derived.by( () => {
 		if(!states.xsd || !selected_element) { return [] }
 		
-		return find_children_elements(states.xsd, selected_element)
+		// return find_children_elements(states.xsd, selected_element)
+		return find_children_elements(selected_element)
 	})
 
 	

@@ -62,8 +62,9 @@ function convert_complex_types(complexTypes: Element[], root:HTMLElement, filter
 		if(filter?.show_extensions){
 			ext_elements = Array.from(complex_type.querySelectorAll('xs\\:extension'))
 		}
-		const extensions = ext_elements.map( extEl => extEl?.getAttribute('base')?.split(':')[1] )
-		const extension_string = extensions.map( ext => `${name} --|> ${ext}`).join('\n')
+		// const extensions = ext_elements.map( extEl => extEl?.getAttribute('base')?.split(':')[1] )
+		const extensions = ext_elements.map( extEl => normalize_string( extEl?.getAttribute('base') ) )
+		const extension_string = extensions.map( ext => `${name} --|> ${ext} `).join('\n')
 	
 		// 
 		// Attributes
@@ -73,11 +74,11 @@ function convert_complex_types(complexTypes: Element[], root:HTMLElement, filter
 		const attributes = attribute_elements.map( attrEl => {
 			return {
 				name: attrEl.getAttribute('name'),
-				type: attrEl.getAttribute('type')?.split(':')[1],
+				type: normalize_string( attrEl.getAttribute('type') ),
 				// TODO: optionality is missing
 			}
 		})
-		const attribute_string = attributes.map( attr => `${name} : +${attr.type} ${attr.name} `).join('\n')
+		const attribute_string = attributes.map( attr => `${name} : + ${attr.type} ${attr.name} `).join('\n')
 
 		// 
 		// Children
@@ -88,7 +89,8 @@ function convert_complex_types(complexTypes: Element[], root:HTMLElement, filter
 		}
 		const child_connections = child_elements.map( child => `${name} ..> ${child.getAttribute('type')}`).join('\n')
 		// const child_connections = child_elements.map( child => `${name} ..> ${child.getAttribute('type')} : ${child.getAttribute('name')}`).join('\n')
-		const child_attributes = child_elements.map( child => `${name} : ${child.getAttribute('type')?.split(':')[1] }[] ${child.getAttribute('name')}`).join('\n')
+		// const child_attributes = child_elements.map( child => `${name} : ${child.getAttribute('type')?.split(':')[1] }[] ${child.getAttribute('name')}`).join('\n')
+		const child_attributes = child_elements.map( child => `${name} : ${ normalize_string( child.getAttribute('type')) }[] ${child.getAttribute('name')}`).join('\n')
 
 		// 
 		// Related Nodes
@@ -97,8 +99,10 @@ function convert_complex_types(complexTypes: Element[], root:HTMLElement, filter
 		if(is_current_node_related){
 			const parent_elements = find_parent_elements(complex_type, root)
 			all_related_nodes.push(name)
-			all_related_nodes.push(...child_elements.map( el => el.getAttribute('type')?.split(':')[1] ?? ""))
-			all_related_nodes.push(...ext_elements.map( el => el?.getAttribute('base')?.split(':')[1] ?? ""))
+			// all_related_nodes.push(...child_elements.map( el => el.getAttribute('type')?.split(':')[1] ?? ""))
+			// all_related_nodes.push(...ext_elements.map( el => el?.getAttribute('base')?.split(':')[1] ?? ""))
+			all_related_nodes.push(...child_elements.map( el => normalize_string(el.getAttribute('type')) ))
+			all_related_nodes.push(...ext_elements.map( el => normalize_string(el?.getAttribute('base')) ))
 			all_related_nodes.push(...parent_elements.map( el => el.getAttribute('name') ?? ""))
 		}
 
@@ -156,8 +160,7 @@ export function find_extensions_recursive(root: Element, xs: Element): Element[]
 function find_extensions(root: Element, xs: Element): Element[] {
 	const extElements = Array.from(xs.querySelectorAll('xs\\:extension'))
 	const base_names = extElements
-		.map( extEl => extEl?.getAttribute('base')
-		?.split(':')[1] )
+		.map( extEl => normalize_string( extEl?.getAttribute('base') ) )
 		.filter(Boolean) as string[]
 	const extensions = base_names
 		.map( base_name => find_complex_type_by_name(root, base_name) )
@@ -193,6 +196,16 @@ function theme({dark_mode}: {dark_mode: boolean}): string {
 	} else {
 		return theme_light
 	}
+}
+
+function normalize_string(str: Nullable<string>): string {
+	if(!str){ return "" }
+	const has_namespace = str.includes(":")
+	if(!has_namespace){ return str }
+
+	const name_without_namespace = str.split(":")[1]
+
+	return name_without_namespace
 }
 
 const theme_light = `
