@@ -2,6 +2,7 @@
 	import type { Snippet } from "svelte";
 	import Bell from "lucide-svelte/icons/bell";
 	import ScanSearch from "lucide-svelte/icons/scan-search";
+	import ChevronRight from "lucide-svelte/icons/chevron-right";
 	import * as Tabs from "$lib/components/ui/tabs/";
 	import { Button } from "$lib/components/ui/button/index.js";
 	import Sidebar from "$lib/sidebar.svelte"
@@ -21,7 +22,14 @@
 		<div class="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
 		  <a href="/" class="flex items-center gap-2 font-semibold">
 			<ScanSearch class="h-6 w-6" />
-			<span class="">XSD Lens</span>	
+			<span class="">
+				XSD Lens
+			</span>	
+			{#if states.file}
+				<ChevronRight class="h-6 w-6"/>
+				<span class="text-xs text-muted-foreground"> {states.file?.name} </span>
+			{/if}
+			
 		  </a>
 		  <span class="ml-auto h-8 w-8">
 			  <ColorSwitcher />

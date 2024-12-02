@@ -40,6 +40,7 @@
 	let user_dragging = $state(false);
 
 	function handle_drop(e: CustomEvent) {
+		console.log("handle_drop", {e})
 		const { acceptedFiles } = e.detail;
 		states.file = acceptedFiles[0];
 	}
